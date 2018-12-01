@@ -1,9 +1,8 @@
 // React.memo
 import React, {useState} from 'react'
 
-// 🐨 1. wrap this in a call to React.memo
-// 💰 const MyComponent = React.memo(function MyComponent() {})
-function Upper({children}) {
+
+const Upper = React.memo(function Upper({children}) {
   const [count, setCount] = useState(0)
   return (
     <div>
@@ -11,7 +10,7 @@ function Upper({children}) {
       <button onClick={() => setCount(count + 1)}>{count}</button>
     </div>
   )
-}
+})
 
 function App() {
   const [first, setFirstName] = useState('')
