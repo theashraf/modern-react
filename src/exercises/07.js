@@ -1,6 +1,5 @@
 // Stopwatch: useReducer (a la redux)
-// 🐨 1. swap useState with useReducer
-import React, {useState, useEffect, useRef} from 'react'
+import React, {useEffect, useRef, useReducer} from 'react'
 
 const buttonStyles = {
   border: '1px solid #ccc',
@@ -11,30 +10,34 @@ const buttonStyles = {
   width: 200,
 }
 
-// 🐨 2. create a function called reducer
-// 💰 function reducer(state, action) {}
-// The contents of this function can be whatever you would like.
-// but here's an example of one of the state transitions that would work well:
-// function reducer(state, action) {
-//   switch (action.type) {
-//     // handle more cases here...
-//     case 'CLEAR':
-//       return {
-//         ...state,
-//         running: false,
-//         lapse: 0,
-//       }
-//     default:
-//       break;
-//   }
-// }
+function reducer(state, action) {
+  switch (action.type) {
+    case 'LAPSE':
+      return {
+        ...state,
+        lapse: action.now - action.startTime,
+      }
+    case 'TOGGLE_RUNNING':
+      return {
+        ...state,
+        running: !state.running,
+      }
+    case 'CLEAR':
+      return {
+        ...state,
+        running: false,
+        lapse: 0,
+      }
+    default:
+      break
+  }
+}
 
 function Stopwatch() {
-  // 🐨 3. swap these `useState` calls with a single `useReducer` call
-  // 💰 `const [state, dispatch] = useReducer(reducer, initialStateObject)
-  // https://reactjs.org/docs/hooks-reference.html#usereducer
-  const [lapse, setLapse] = useState(0)
-  const [running, setRunning] = useState(false)
+  const [{lapse, running}, dispatch] = useReducer(reducer, {
+    lapse: 0,
+    running: false,
+  })
   const timerRef = useRef(null)
 
   useEffect(() => () => clearInterval(timerRef.current), [])
@@ -44,20 +47,17 @@ function Stopwatch() {
       clearInterval(timerRef.current)
     } else {
       const startTime = Date.now() - lapse
+
       timerRef.current = setInterval(() => {
-        // 🐨 4. swap this with a call to dispatch
-        setLapse(Date.now() - startTime)
+        dispatch({type: 'LAPSE', now: Date.now(), startTime})
       }, 0)
     }
-    // 🐨 5. swap this with a call to dispatch
-    setRunning(!running)
+    dispatch({type: 'TOGGLE_RUNNING'})
   }
 
   function handleClearClick() {
     clearInterval(timerRef.current)
-    // 🐨 6. swap this with a call to dispatch
-    setLapse(0)
-    setRunning(false)
+    dispatch({type: 'CLEAR'})
   }
 
   return (
