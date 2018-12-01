@@ -14,10 +14,7 @@ function reducer(currentState, newState) {
   return {...currentState, ...newState}
 }
 
-function Stopwatch() {
-  // 🐨 1. put all the logic for the stopwatch (including event handlers)
-  // in a custom hook called useStopwatch
-  // return the state, and event handlers in an object
+function useStopWatch() {
   const [{running, lapse}, setState] = useReducer(reducer, {
     running: false,
     lapse: 0,
@@ -43,20 +40,36 @@ function Stopwatch() {
     setState({running: false, lapse: 0})
   }
 
-  // 🐨 2. call your useStopwatch custom hook and get the state and event handlers
-  // for two individual stopwatches.
+  return {
+    lapse,
+    running,
+    handleClearClick,
+    handleRunClick,
+  }
+}
 
-  // 🐨 3. update the returned JSX to render two stopwatches and the diff between them
-  // 💰 if you want the tests to pass, make sure to pass a `data-testid="diff"` prop
-  // to the span where you render the difference.
+function Stopwatch() {
+  const stopWatchOne = useStopWatch()
+  const stopWatchTwo = useStopWatch()
 
   return (
     <div style={{textAlign: 'center'}}>
       <StopwatchView
-        lapse={lapse}
-        running={running}
-        onRunClick={handleRunClick}
-        onClearClick={handleClearClick}
+        lapse={stopWatchOne.lapse}
+        running={stopWatchOne.running}
+        onRunClick={stopWatchOne.handleRunClick}
+        onClearClick={stopWatchOne.handleClearClick}
+      />
+      <hr />
+      <strong>
+        <span data-testid="diff">{stopWatchOne.lapse - stopWatchTwo.lapse}</span>
+      </strong>
+      <hr />
+      <StopwatchView
+        lapse={stopWatchTwo.lapse}
+        running={stopWatchTwo.running}
+        onRunClick={stopWatchTwo.handleRunClick}
+        onClearClick={stopWatchTwo.handleClearClick}
       />
     </div>
   )
